@@ -1,12 +1,13 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { SiCodechef } from "react-icons/si";
 import Dropdown from "./Dropdown";
 import { RecipeContext } from "../context/userContext";
 import fetchDishes from "./utils/fetchDishes";
 import { useNavigate } from "react-router-dom";
+import { FiMenu } from "react-icons/fi";
 
 const Header = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const {
     setData,
     setIsLoading,
@@ -15,6 +16,9 @@ const Header = () => {
     searchBox,
     setSearchBox,
   } = useContext(RecipeContext);
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const cuisine = [
     "Afghan",
     "Albanian",
@@ -28,7 +32,6 @@ const Header = () => {
     "Bulgarian",
     "Burmese",
     "Catalan",
-    "Central Asian",
     "Chinese",
     "Croatian",
     "Czech",
@@ -93,31 +96,40 @@ const Header = () => {
     "Vietnamese",
     "Welsh",
   ];
+
   const category = ["Veg & non-veg", "veg-only"];
+
   const fetchData = async () => {
     setIsLoading(true);
     const recipes = await fetchDishes(20, searchBox, currCategory, currCuisine);
     setData(recipes);
     setIsLoading(false);
   };
-  useEffect(() => {
-    fetchData();
-  }, [currCategory, currCuisine]);
 
   const submitHandler = (e) => {
     e.preventDefault();
     fetchData();
-    navigate('/')
+    navigate("/");
     setSearchBox("");
-  }
+    setIsMenuOpen(false); // Close mobile menu
+  };
 
   return (
-    <div className="w-full py-3 px-5 flex justify-between bg-black">
-      <div className="flex gap-2 items-center">
-        <SiCodechef className="text-3xl  text-sky-400" />
+    <div className="w-full bg-black py-3 px-4 flex items-center justify-between relative">
+      {/* Logo */}
+      <div
+        className="flex gap-2 items-center cursor-pointer"
+        onClick={() => navigate("/")}
+      >
+        <SiCodechef className="text-3xl text-sky-400" />
         <span className="text-2xl font-bold text-fuchsia-200">DishGPT</span>
       </div>
-      <form className="flex gap-5" onSubmit={submitHandler}>
+
+      {/* Desktop form */}
+      <form
+        className="hidden sm:flex flex-row gap-2 items-center"
+        onSubmit={submitHandler}
+      >
         <Dropdown defaultValue="Cuisine" options={cuisine} type="cuisine" />
         <Dropdown
           defaultValue="Veg & non-veg"
@@ -126,17 +138,51 @@ const Header = () => {
         />
         <input
           type="text"
-          className="inline-flex justify-between w-96 rounded-md px-3 py-2 text-sm font-medium border-1 outline-none transition-all duration-200 text-white"
-          placeholder="search here.."
+          className="w-64 md:w-80 px-3 py-2 rounded-md text-sm sm:text-base outline-none border border-gray-300 text-white bg-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+          placeholder="Search here..."
           value={searchBox}
-          onChange={(e) => {
-            setSearchBox(e.target.value);
-          }}
+          onChange={(e) => setSearchBox(e.target.value)}
         />
-        <button className="bg-blue-500 px-4 rounded-3xl cursor-pointer">
+        <button className="bg-blue-500 px-4 py-2 rounded-3xl text-sm sm:text-base font-medium hover:bg-blue-600 transition-colors duration-200">
           Search
         </button>
       </form>
+
+      {/* Mobile toggle button */}
+      <button
+        className="sm:hidden text-white text-2xl"
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+      >
+        <FiMenu />
+      </button>
+
+      {/* Mobile menu */}
+      {isMenuOpen && (
+        <form
+          className="absolute top-full right-0 left-0 mt-1 bg-gray-900 p-4 rounded-b-lg flex flex-col gap-2 sm:hidden z-50"
+          onSubmit={submitHandler}
+        >
+          <Dropdown defaultValue="Cuisine" options={cuisine} type="cuisine" />
+          <Dropdown
+            defaultValue="Veg & non-veg"
+            options={category}
+            type="category"
+          />
+          <input
+            type="text"
+            className="w-full px-3 py-2 rounded-md text-sm sm:text-base outline-none border border-gray-300 text-white bg-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+            placeholder="Search here..."
+            value={searchBox}
+            onChange={(e) => setSearchBox(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="bg-blue-500 px-4 py-2 rounded-3xl text-sm sm:text-base font-medium hover:bg-blue-600 transition-colors duration-200"
+          >
+            Search
+          </button>
+        </form>
+      )}
     </div>
   );
 };

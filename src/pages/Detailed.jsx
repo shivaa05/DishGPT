@@ -10,42 +10,45 @@ const Detailed = () => {
   const location = useLocation();
   const [detailedRecipe, setDetailedRecipe] = useState({});
   const { name } = useParams();
-  const { currDishImage, setIsLoading, isLoading } = useContext(RecipeContext);
+  const { setIsLoading } = useContext(RecipeContext);
   const { image } = location.state || {};
-  
+
   const fetchData = async () => {
     setIsLoading(true);
     const detailedRecipeData = await aiCall(name, 4);
     setDetailedRecipe(detailedRecipeData);
-    console.log(detailedRecipe);
-
     setIsLoading(false);
   };
+
   useEffect(() => {
     fetchData();
   }, []);
-  useEffect(() => {
-    console.log(detailedRecipe);
-  }, [detailedRecipe]);
 
   return (
-    <div className="w-full px-40 py-6 backdrop-blur-md">
-      <h1 className="text-center text-3xl font-extrabold font-serif">{name}</h1>
-      <div className="overflow-y-hidden h-screen flex gap-8 mt-4 pb-4 ">
+    <div className="w-full px-4 sm:px-6 md:px-10 lg:px-20 py-6 backdrop-blur-md">
+      <h1 className="text-center text-2xl sm:text-3xl md:text-4xl font-extrabold font-serif mb-6">
+        {name}
+      </h1>
+
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Dish Image */}
         <img
           src={image}
-          alt="Dish image"
-          className="h-96 object-cover rounded-2xl mt-20"
+          alt="Dish"
+          className="w-full lg:w-1/3 h-64 sm:h-80 md:h-96 object-cover rounded-2xl"
         />
-        <div className="h-full overflow-y-scroll py-5">
-          <div className="border-[1px] mb-7 bg-neutral-950 border-blue-300 p-3 mr-10 rounded-lg shadow-[14px_13px_20px_rgba(0,0,0,0.5)]">
-            <div className="pb-1 text-xl flex justify-between">
-              <div className="flex gap-2 items-center ">
+
+        {/* Details */}
+        <div className="flex-1 overflow-y-auto space-y-6">
+          {/* Basic Info */}
+          <div className="border border-blue-300 bg-neutral-950 p-4 rounded-lg shadow-lg">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+              <div className="flex gap-2 items-center text-lg sm:text-xl">
                 <BiSolidDish /> {name}
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-3 mt-2 sm:mt-0">
                 <GoDotFill
-                  className={`border-2 ${
+                  className={`${
                     detailedRecipe.vegetarian
                       ? "text-green-600"
                       : "text-red-500"
@@ -54,40 +57,40 @@ const Detailed = () => {
                 <ImSpoonKnife />
               </div>
             </div>
-            <p>{detailedRecipe.short_intro}</p>
-            <div className="flex mt-2 gap-5">
-              <span className="bg-zinc-600 px-3 py-[3px] rounded-2xl">
+            <p className="text-sm sm:text-base">{detailedRecipe.short_intro}</p>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <span className="bg-zinc-600 px-3 py-1 rounded-2xl text-sm sm:text-base">
                 {detailedRecipe.vegetarian ? "veg" : "non-veg"}
               </span>
-              <span className="bg-zinc-600 px-3 py-[3px] rounded-2xl">
+              <span className="bg-zinc-600 px-3 py-1 rounded-2xl text-sm sm:text-base">
                 {detailedRecipe.time}
               </span>
-              <span className="bg-zinc-600 px-3 py-[3px] rounded-2xl">
+              <span className="bg-zinc-600 px-3 py-1 rounded-2xl text-sm sm:text-base">
                 {detailedRecipe.calories}
               </span>
-              <span className="bg-zinc-600 px-3 py-[3px] rounded-2xl">
+              <span className="bg-zinc-600 px-3 py-1 rounded-2xl text-sm sm:text-base">
                 {detailedRecipe.difficulty}
               </span>
             </div>
           </div>
+
           {/* Steps */}
-          <div className="border-[1px] mb-7 bg-neutral-950 border-blue-300 p-3 mr-10 rounded-lg shadow-[14px_13px_20px_rgba(0,0,0,0.5)]">
+          <div className="border border-blue-300 bg-neutral-950 p-4 rounded-lg shadow-lg">
             <h2 className="text-xl font-bold mb-2">Steps</h2>
-            <ul>
+            <ul className="list-decimal pl-5 space-y-1">
               {detailedRecipe.steps?.map((step, index) => (
-                <li key={index} className="pb-2">
-                  {index + 1}. {step}
-                </li>
+                <li key={index}>{step}</li>
               ))}
             </ul>
           </div>
-          {/* ingredients */}
-          <div className="border-[1px] bg-neutral-950 border-blue-300 p-3 mr-10 rounded-lg shadow-[14px_13px_20px_rgba(0,0,0,0.5)]">
+
+          {/* Ingredients */}
+          <div className="border border-blue-300 bg-neutral-950 p-4 rounded-lg shadow-lg">
             <h2 className="text-xl font-bold mb-2">Ingredients</h2>
-            <ul className="list-disc ps-6 grid grid-cols-2">
+            <ul className="list-disc pl-5 grid grid-cols-1 sm:grid-cols-2 gap-2">
               {detailedRecipe.ingredients?.map((ingredient, index) => (
-                <li key={index} className="pb-2">
-                  {ingredient.name} {" - "}({ingredient.quantity})
+                <li key={index}>
+                  {ingredient.name} - ({ingredient.quantity})
                 </li>
               ))}
             </ul>
