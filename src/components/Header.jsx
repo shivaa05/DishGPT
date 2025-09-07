@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SiCodechef } from "react-icons/si";
 import Dropdown from "./Dropdown";
 import { RecipeContext } from "../context/userContext";
@@ -105,6 +105,9 @@ const Header = () => {
     setData(recipes);
     setIsLoading(false);
   };
+   useEffect(() => {
+     fetchData();
+   }, [currCuisine, currCategory]);
 
   const submitHandler = (e) => {
     e.preventDefault();
